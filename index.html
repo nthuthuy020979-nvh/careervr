@@ -480,6 +480,26 @@
         answeredCount,
         time: new Date().toISOString()
       };
+      // ===== LƯU HỒ SƠ HƯỚNG NGHIỆP HIỆN TẠI (CHO AI & VR) =====
+const careerProfile = {
+  student: {
+    name: record.name,
+    class: record.cls,
+    school: record.school
+  },
+  riasec: {
+    scores: record.scores,
+    top3: record.riasec,
+    backup: record.backupMajor ? record.backupMajor.code[0] : null
+  },
+  suggestedMajors: record.suggestedMajors,
+  createdAt: record.time
+};
+
+localStorage.setItem(
+  'career_profile',
+  JSON.stringify(careerProfile)
+);
 
       const db = readDB();
       db.push(record);
