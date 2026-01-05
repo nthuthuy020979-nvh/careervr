@@ -56,7 +56,8 @@ def run_riasec(data: RIASECRequest):
             "phù hợp với học sinh THPT Việt Nam."
         ),
         "response_mode": "blocking",
-        "user": data.name
+        "user": data.name.strip() if data.name.strip() else "student"
+
     }
 
     headers = {
@@ -95,3 +96,4 @@ def run_riasec(data: RIASECRequest):
             }
         }
     }
+
