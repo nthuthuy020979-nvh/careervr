@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trắc nghiệm Hướng nghiệp RIASEC (50 câu)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: auto;
+      padding: 10px;
+    }
+    h2, h3 {
+      text-align: center;
+    }
+    .info input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+    .question {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .q-title {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .options label {
+      margin-right: 12px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #f6f6f6;
+      padding: 12px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>TRẮC NGHIỆM HƯỚNG NGHIỆP RIASEC (50 CÂU)</h2>
+
+<p>
+<b>Thang đo:</b><br>
+1 = Rất không đúng với tôi |
+2 = Không đúng |
+3 = Phân vân |
+4 = Đúng |
+5 = Rất đúng với tôi
+</p>
+
+<div class="info">
+  <input id="name" placeholder="Họ và tên học sinh" required>
+  <input id="class" placeholder="Lớp đang học" required>
+  <input id="school" placeholder="Trường đang học" required>
+</div>
+
+<form id="quiz">
+  <div id="questions"></div>
+  <button type="submit">Xem kết quả hướng nghiệp</button>
+</form>
+
+<h3>KẾT QUẢ TƯ VẤN</h3>
+<pre id="result">Vui lòng hoàn thành trắc nghiệm để xem kết quả.</pre>
+
+<script>
+// ================== API BACKEND ==================
+const API_URL =
+  "https://careervr-backend.onrender.com/run-riasec";
+
+// ================== DANH SÁCH 50 CÂU HỎI ==================
+const questions = [
+  "Tôi thích sửa chữa, lắp ráp đồ đạc hoặc thiết bị.",
+  "Tôi hứng thú với các công việc cần vận động hoặc làm ngoài trời.",
+  "Tôi thích làm việc với công cụ, máy móc hơn là giấy tờ.",
+  "Tôi học tốt hơn khi được làm trực tiếp thay vì chỉ nghe giảng.",
+
+  "Tôi thích tìm hiểu nguyên nhân – kết quả của một vấn đề.",
+  "Tôi thích các môn học cần suy luận như Toán, Lý, Hóa.",
+  "Tôi thường đặt câu hỏi “vì sao” khi học kiến thức mới.",
+  "Tôi thích phân tích dữ liệu, thí nghiệm hoặc nghiên cứu.",
+
+  "Tôi thích vẽ, viết, thiết kế hoặc sáng tạo nội dung.",
+  "Tôi không thích công việc quá khuôn mẫu, lặp lại.",
+  "Tôi thích thể hiện ý tưởng và cảm xúc cá nhân.",
+  "Tôi hứng thú với âm nhạc, mỹ thuật hoặc truyền thông.",
+
+  "Tôi thích giúp đỡ, hướng dẫn hoặc hỗ trợ người khác.",
+  "Tôi cảm thấy vui khi làm việc nhóm.",
+  "Tôi có xu hướng lắng nghe và chia sẻ với mọi người.",
+  "Tôi thích các công việc liên quan đến giáo dục, y tế hoặc xã hội.",
+
+  "Tôi thích lãnh đạo hoặc thuyết phục người khác.",
+  "Tôi hứng thú với kinh doanh, bán hàng hoặc tổ chức hoạt động.",
+  "Tôi tự tin khi trình bày ý kiến trước đám đông.",
+  "Tôi thích đặt mục tiêu và chinh phục kết quả.",
+
+  "Tôi thích công việc rõ ràng, có quy trình cụ thể.",
+  "Tôi cẩn thận với số liệu, hồ sơ và giấy tờ.",
+  "Tôi thích làm việc có kế hoạch, thời gian biểu rõ ràng.",
+  "Tôi cảm thấy yên tâm khi mọi việc được sắp xếp gọn gàng.",
+
+  "Tôi học tốt hơn khi được thực hành, thao tác trực tiếp.",
+  "Tôi học tốt các môn cần tư duy logic và phân tích.",
+  "Tôi sử dụng máy tính và phần mềm học tập hiệu quả.",
+  "Tôi giao tiếp và trình bày ý kiến khá tự tin.",
+  "Tôi làm tốt các công việc cần thao tác tay hoặc kỹ thuật.",
+  "Tôi tiếp thu nhanh khi được quan sát và làm thử.",
+  "Tôi có khả năng phân tích vấn đề và tìm cách giải quyết.",
+  "Tôi thích các nhiệm vụ cần suy luận, tính toán.",
+  "Tôi có khả năng sáng tạo ý tưởng mới.",
+  "Tôi thường có cách làm riêng, không thích bị bó buộc.",
+  "Tôi có khả năng lắng nghe và hỗ trợ người khác.",
+  "Tôi cảm thấy thoải mái khi làm việc nhóm.",
+  "Tôi tự tin đưa ra ý kiến và dẫn dắt nhóm.",
+  "Tôi làm việc hiệu quả khi có kế hoạch rõ ràng.",
+
+  "Tôi coi trọng thu nhập và cơ hội thăng tiến.",
+  "Tôi mong muốn công việc ổn định, lâu dài.",
+  "Tôi muốn nghề nghiệp có ích cho xã hội.",
+  "Tôi coi trọng sự sáng tạo trong công việc.",
+  "Tôi muốn nghề nghiệp giúp tôi phát triển bản thân.",
+  "Tôi thích môi trường làm việc linh hoạt.",
+  "Tôi coi trọng việc không ngừng học hỏi.",
+  "Tôi mong muốn nghề nghiệp phản ánh giá trị cá nhân.",
+
+  "Tôi sẵn sàng học tập dài hạn để theo đuổi nghề phù hợp.",
+  "Điều kiện tài chính gia đình cho phép tôi học tập.",
+  "Gia đình ủng hộ lựa chọn nghề nghiệp của tôi.",
+  "Tôi sẵn sàng lập kế hoạch để theo đuổi nghề đã chọn."
+];
+
+// Render câu hỏi
+const qDiv = document.getElementById("questions");
+questions.forEach((q, i) => {
+  const div = document.createElement("div");
+  div.className = "question";
+  div.innerHTML = `
+    <div class="q-title">Câu ${i + 1}: ${q}</div>
+    <div class="options">
+      ${[1,2,3,4,5].map(v =>
+        `<label><input type="radio" name="q${i}" value="${v}" required> ${v}</label>`
+      ).join(" ")}
+    </div>
+  `;
+  qDiv.appendChild(div);
+});
+
+// Submit bài
+document.getElementById("quiz").onsubmit = async (e) => {
+  e.preventDefault();
+
+  const answers = [];
+  for (let i = 0; i < 50; i++) {
+    const checked = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!checked) {
+      alert("Bạn chưa trả lời đủ 50 câu.");
+      return;
+    }
+    answers.push(parseInt(checked.value));
+  }
+
+  const payload = {
+    name: document.getElementById("name").value,
+    class: document.getElementById("class").value,
+    school: document.getElementById("school").value,
+    answers_json: answers
+  };
+
+  const resultBox = document.getElementById("result");
+  resultBox.innerText = "⏳ Hệ thống đang phân tích kết quả hướng nghiệp...";
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      resultBox.innerText = "❌ Lỗi từ hệ thống:\n" + JSON.stringify(data, null, 2);
+      return;
+    }
+
+    resultBox.innerText =
+      data.data?.outputs?.text || "❌ Không nhận được kết quả tư vấn.";
+
+  } catch (err) {
+    resultBox.innerText =
+      "❌ Không kết nối được tới hệ thống.\n" + err.message;
+  }
+};
+</script>
+
+</body>
+</html>
