@@ -35,10 +35,10 @@ pip install -r requirements.txt
 cp .env.example ../.env
 # Edit ../.env and add your DIFY_API_KEY
 
-# 4. Start backend
+# 4. Start backend (from project root)
 cd ..
 source venv/bin/activate
-uvicorn backend/main:app --reload --host 0.0.0.0 --port 8000
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 
 # 5. Open frontend (in another terminal)
 # Terminal 2:
@@ -82,8 +82,8 @@ curl http://localhost:8000/health
 # {"status":"ok","message":"CareerVR backend is running"}
 
 # If port 8000 is not accessible, check if server is running in another terminal
-# If needed, use a different port:
-# uvicorn backend/main:app --reload --port 8001
+# If needed, use a different port (use dot notation, not slash):
+# uvicorn backend.main:app --reload --port 8001
 ```
 
 ---
@@ -108,8 +108,8 @@ curl http://localhost:8000/health
 | `CORS Error` | Make sure backend is running on `http://localhost:8000` |
 | `404 Not Found` | Check API_URL in index.html matches backend location |
 | `500 Server Error` | Check DIFY_API_KEY is set in .env file |
-| Port 8000 already in use | Use different port: `uvicorn backend/main:app --port 8001` |
-| Backend won't start | Check for syntax errors: `python3 -c "from main import app"` in backend/ |
+| Port 8000 already in use | Use different port: `uvicorn backend.main:app --port 8001` (use dot, not slash) |
+| Backend won't start | Check for syntax errors: `cd backend && python3 -c "from main import app"` |
 | Python 3.13 issues | Make sure all dependencies installed: `pip install -r requirements.txt` |
 
 ---
