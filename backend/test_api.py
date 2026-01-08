@@ -22,7 +22,7 @@ def test_riasec_valid():
         "name": "Nguyễn Văn A",
         "class": "10A1",
         "school": "THPT Ngô Quyền",
-        "answers_json": list(range(1, 6)) * 10  # 50 answers: [1,2,3,4,5,1,2,3,4,5,...]
+        "answer": list(range(1, 6)) * 10  # 50 answers: [1,2,3,4,5,1,2,3,4,5,...]
     }
     
     # This will fail with 500 due to missing DIFY_API_KEY
@@ -38,7 +38,7 @@ def test_riasec_invalid_answers_count():
         "name": "Test",
         "class": "10A1",
         "school": "School",
-        "answers_json": [1, 2, 3]  # Only 3 answers, should fail
+        "answer": [1, 2, 3]  # Only 3 answers, should fail
     }
     
     response = client.post("/run-riasec", json=payload)
@@ -51,7 +51,7 @@ def test_riasec_invalid_answer_value():
         "name": "Test",
         "class": "10A1",
         "school": "School",
-        "answers_json": [1, 2, 3, 4, 6] + [1] * 45  # 6 is invalid (should be 1-5)
+        "answer": [1, 2, 3, 4, 6] + [1] * 45  # 6 is invalid (should be 1-5)
     }
     
     response = client.post("/run-riasec", json=payload)
@@ -64,7 +64,7 @@ def test_riasec_empty_name():
         "name": "",
         "class": "10A1",
         "school": "School",
-        "answers_json": [1] * 50
+        "answer": [1] * 50
     }
     
     response = client.post("/run-riasec", json=payload)
@@ -77,7 +77,7 @@ def test_riasec_whitespace_name():
         "name": "   ",
         "class": "10A1",
         "school": "School",
-        "answers_json": [1] * 50
+        "answer": [1] * 50
     }
     
     response = client.post("/run-riasec", json=payload)

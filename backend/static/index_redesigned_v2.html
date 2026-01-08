@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -66,6 +67,82 @@
       color: #cfe0ff;
     }
 
+    /* ===== LOADING MODAL ===== */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    .loading-modal {
+      background: linear-gradient(135deg, #0b1220 0%, #0f1a33 100%);
+      border: 1px solid rgba(26, 60, 255, 0.3);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(26, 60, 255, 0.2);
+      border-top: 4px solid #1a3cff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      font-size: 1.1rem;
+      color: #cfe0ff;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .loading-subtext {
+      font-size: 0.9rem;
+      color: #9fb7ff;
+      margin-top: 0.5rem;
+    }
+
     /* ===== MAIN CONTAINER ===== */
     .wrapper {
       max-width: 1200px;
@@ -87,6 +164,7 @@
         opacity: 0;
         transform: translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -302,7 +380,7 @@
       margin: 0;
     }
 
-    .answer-option input[type="radio"]:checked + label {
+    .answer-option input[type="radio"]:checked+label {
       background: linear-gradient(135deg, #1a3cff, #1a3cff);
       border-color: #1a3cff;
       color: #fff;
@@ -531,289 +609,319 @@
     }
   </style>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<header>
-  <div class="logo">CareerVR</div>
-  <nav>
-    <a href="#" data-page="landing" class="nav-link active">Trang chủ</a>
-    <a href="#" data-page="test" class="nav-link">RIASEC Test</a>
-    <a href="#" data-page="results" class="nav-link">Kết quả</a>
-    <a href="#" data-page="chatbot" class="nav-link">💬 AI Chatbot</a>
-    <a href="#" data-page="dashboard" class="nav-link">Thống kê</a>
-  </nav>
-</header>
-
-<!-- MAIN CONTENT -->
-<div class="wrapper">
-
-  <!-- LANDING PAGE -->
-  <section class="page active" id="landing">
-    <div class="hero">
-      <div class="hero-content">
-        <h1>Khám phá con đường sự nghiệp của bạn</h1>
-        <p>Sử dụng trắc nghiệm RIASEC được cá nhân hóa để tìm hiểu về những ngành nghề phù hợp nhất với bạn. Trải nghiệm VR và nhận lời khuyên từ AI.</p>
-        <div class="cta-group">
-          <button class="btn btn-primary" onclick="goPage('test')">Bắt đầu trắc nghiệm</button>
-          <button class="btn btn-secondary" onclick="goPage('dashboard')">Xem thống kê</button>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="icon-large">🎯</div>
-      </div>
+  <!-- LOADING MODAL -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-modal">
+      <div class="spinner"></div>
+      <div class="loading-text">🤖 AI đang suy nghĩ...</div>
+      <div class="loading-subtext">Vui lòng chờ khi AI phân tích hồ sơ của bạn</div>
     </div>
+  </div>
 
-    <div class="features">
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
-        <h3>RIASEC Test</h3>
-        <p>50 câu hỏi khoa học để đánh giá sở thích, kỹ năng, và tính cách của bạn</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🥽</div>
-        <h3>Trải nghiệm VR</h3>
-        <p>Khám phá các ngành nghề qua trực quan hóa VR tương tác</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🤖</div>
-        <h3>Tư vấn AI</h3>
-        <p>Chatbot thông minh giúp bạn trả lời mọi câu hỏi về hộ sự nghiệp</p>
-      </div>
-    </div>
-  </section>
+  <!-- HEADER -->
+  <header>
+    <div class="logo">CareerVR</div>
+    <nav>
+      <a href="#" data-page="landing" class="nav-link active">Trang chủ</a>
+      <a href="#" data-page="test" class="nav-link">RIASEC Test</a>
+      <a href="#" data-page="results" class="nav-link">Kết quả</a>
+      <a href="#" data-page="chatbot" class="nav-link">💬 AI Chatbot</a>
+      <a href="#" data-page="dashboard" class="nav-link">Thống kê</a>
+    </nav>
+  </header>
 
-  <!-- TEST PAGE -->
-  <section class="page" id="test">
-    <div class="test-container">
-      <h1 style="text-align: center; margin-bottom: 3rem;">Trắc nghiệm RIASEC</h1>
+  <!-- MAIN CONTENT -->
+  <div class="wrapper">
 
-      <!-- Info input -->
-      <div class="test-section" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(26, 60, 255, 0.3);">
-        <h2 style="font-size: 1.25rem;">Thông tin cá nhân</h2>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-          <div>
-            <label for="name">Họ và tên</label>
-            <input type="text" id="name" placeholder="Nguyễn Văn A" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
-          </div>
-          <div>
-            <label for="class">Lớp</label>
-            <input type="text" id="class" placeholder="10A1" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
-          </div>
-          <div>
-            <label for="school">Trường</label>
-            <input type="text" id="school" placeholder="THPT ..." style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
+    <!-- LANDING PAGE -->
+    <section class="page active" id="landing">
+      <div class="hero">
+        <div class="hero-content">
+          <h1>Khám phá con đường sự nghiệp của bạn</h1>
+          <p>Sử dụng trắc nghiệm RIASEC được cá nhân hóa để tìm hiểu về những ngành nghề phù hợp nhất với bạn. Trải
+            nghiệm VR và nhận lời khuyên từ AI.</p>
+          <div class="cta-group">
+            <button class="btn btn-primary" onclick="goPage('test')">Bắt đầu trắc nghiệm</button>
+            <button class="btn btn-secondary" onclick="goPage('dashboard')">Xem thống kê</button>
           </div>
         </div>
-      </div>
-
-      <!-- Progress -->
-      <div class="progress-section">
-        <div class="progress-bar">
-          <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-        </div>
-        <div class="progress-text">
-          <span id="progressText">0 / 50 câu</span>
-          <span id="estimatedTime">~10 phút</span>
+        <div class="hero-visual">
+          <div class="icon-large">🎯</div>
         </div>
       </div>
 
-      <!-- Scale explanation -->
-      <div class="scale-explanation">
-        <strong>Hướng dẫn trả lời:</strong> Với mỗi câu hỏi, hãy đánh giá từ 1 (Rất không đúng) đến 5 (Rất đúng)
-        <div class="scale-legend">
-          <div class="scale-item">1️⃣ Rất không đúng</div>
-          <div class="scale-item">2️⃣ Không đúng</div>
-          <div class="scale-item">3️⃣ Phân vân</div>
-          <div class="scale-item">4️⃣ Đúng</div>
-          <div class="scale-item">5️⃣ Rất đúng</div>
+      <div class="features">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>RIASEC Test</h3>
+          <p>50 câu hỏi khoa học để đánh giá sở thích, kỹ năng, và tính cách của bạn</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🥽</div>
+          <h3>Trải nghiệm VR</h3>
+          <p>Khám phá các ngành nghề qua trực quan hóa VR tương tác</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>Tư vấn AI</h3>
+          <p>Chatbot thông minh giúp bạn trả lời mọi câu hỏi về hộ sự nghiệp</p>
         </div>
       </div>
+    </section>
 
-      <!-- Questions form -->
-      <form id="testForm">
-        <div id="questionsContainer"></div>
-        <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; flex-wrap: wrap;">
-          <button type="submit" class="btn btn-primary">Nộp bài</button>
-          <button type="button" class="btn btn-secondary" onclick="resetTest()">Làm lại</button>
-        </div>
-      </form>
-    </div>
-  </section>
+    <!-- TEST PAGE -->
+    <section class="page" id="test">
+      <div class="test-container">
+        <h1 style="text-align: center; margin-bottom: 3rem;">Trắc nghiệm RIASEC</h1>
 
-  <!-- RESULTS PAGE -->
-  <section class="page" id="results">
-    <div class="results-container">
-      <div class="result-header">
-        <h1>Kết quả của bạn</h1>
-        <div class="riasec-badge" id="riasecDisplay">RAI</div>
-        <p id="resultTime" style="color: #9fb7ff; margin-top: 1rem;">-</p>
-      </div>
-
-      <h2 style="margin: 2rem 0 1.5rem 0;">Các ngành gợi ý</h2>
-      <div class="major-grid" id="majorContainer"></div>
-
-      <div style="text-align: center; margin-top: 3rem;">
-        <button class="btn btn-primary" onclick="goPage('test')">Làm lại trắc nghiệm</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- CHATBOT PAGE -->
-  <section class="page" id="chatbot">
-    <div style="max-width: 900px; margin: 2rem auto; padding-bottom: 4rem;">
-      <h1 style="text-align: center; margin-bottom: 2rem;">💬 Tư vấn AI hướng nghiệp</h1>
-
-      <!-- Context card -->
-      <div class="test-section" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(26, 60, 255, 0.3); margin-bottom: 2rem;">
-        <h3 style="margin-top: 0;">📋 Hồ sơ của bạn</h3>
-        <div id="chatContext" style="color: #9fb7ff;">Chưa có dữ liệu. Vui lòng làm trắc nghiệm trước.</div>
-      </div>
-
-      <!-- Chat UI -->
-      <div id="chatContainer" style="border: 1px solid rgba(30, 42, 68, 0.5); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 700px; background: rgba(8, 18, 37, 0.8);">
-        <!-- Messages -->
-        <div id="messagesBox" style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
-          <div style="color: #9fb7ff; font-size: 0.9rem;">
-            <strong>🤖 AI:</strong> Xin chào! Tôi sẵn sàng tư vấn cho bạn dựa trên kết quả RIASEC. Nhấn nút "Yêu cầu tư vấn" bên dưới để bắt đầu.
+        <!-- Info input -->
+        <div class="test-section" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(26, 60, 255, 0.3);">
+          <h2 style="font-size: 1.25rem;">Thông tin cá nhân</h2>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+            <div>
+              <label for="name">Họ và tên</label>
+              <input type="text" id="name" placeholder="Nguyễn Văn A"
+                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
+            </div>
+            <div>
+              <label for="class">Lớp</label>
+              <input type="text" id="class" placeholder="10A1"
+                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
+            </div>
+            <div>
+              <label for="school">Trường</label>
+              <input type="text" id="school" placeholder="THPT ..."
+                style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
+            </div>
           </div>
         </div>
 
-        <!-- Input area -->
-        <div style="border-top: 1px solid rgba(30, 42, 68, 0.5); padding: 1rem; display: flex; gap: 0.75rem;">
-          <input type="text" id="chatInput" placeholder="Hỏi AI về hướng nghiệp của bạn..." style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
-          <button class="btn btn-primary" onclick="sendChatMessage()" style="padding: 0.75rem 1.5rem;">Gửi</button>
+        <!-- Progress -->
+        <div class="progress-section">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+          </div>
+          <div class="progress-text">
+            <span id="progressText">0 / 50 câu</span>
+            <span id="estimatedTime">~10 phút</span>
+          </div>
+        </div>
+
+        <!-- Scale explanation -->
+        <div class="scale-explanation">
+          <strong>Hướng dẫn trả lời:</strong> Với mỗi câu hỏi, hãy đánh giá từ 1 (Rất không đúng) đến 5 (Rất đúng)
+          <div class="scale-legend">
+            <div class="scale-item">1️⃣ Rất không đúng</div>
+            <div class="scale-item">2️⃣ Không đúng</div>
+            <div class="scale-item">3️⃣ Phân vân</div>
+            <div class="scale-item">4️⃣ Đúng</div>
+            <div class="scale-item">5️⃣ Rất đúng</div>
+          </div>
+        </div>
+
+        <!-- Questions form -->
+        <form id="testForm">
+          <div id="questionsContainer"></div>
+          <div style="display: flex; gap: 1rem; margin-top: 2rem; justify-content: center; flex-wrap: wrap;">
+            <button type="submit" class="btn btn-primary">Nộp bài</button>
+            <button type="button" class="btn btn-secondary" onclick="resetTest()">Làm lại</button>
+            <button type="button" class="btn btn-secondary" style="border-color: #ffd700; color: #ffd700;"
+              onclick="devAutoFill()">⚡ Dev Fill</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- RESULTS PAGE -->
+    <section class="page" id="results">
+      <div class="results-container">
+        <div class="result-header">
+          <h1>Kết quả của bạn</h1>
+          <div class="riasec-badge" id="riasecDisplay">RAI</div>
+          <p id="resultTime" style="color: #9fb7ff; margin-top: 1rem;">-</p>
+        </div>
+
+        <h2 style="margin: 2rem 0 1.5rem 0;">Các ngành gợi ý</h2>
+        <div class="major-grid" id="majorContainer"></div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+          <button class="btn btn-primary" onclick="goPage('test')">Làm lại trắc nghiệm</button>
         </div>
       </div>
+    </section>
 
-      <!-- Action buttons -->
-      <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
-        <button class="btn btn-primary" id="consultBtn" onclick="requestCounsel()">✨ Yêu cầu tư vấn</button>
-        <button class="btn btn-secondary" onclick="goPage('results')">← Quay lại kết quả</button>
+    <!-- CHATBOT PAGE -->
+    <section class="page" id="chatbot">
+      <div style="max-width: 900px; margin: 2rem auto; padding-bottom: 4rem;">
+        <h1 style="text-align: center; margin-bottom: 2rem;">💬 Tư vấn AI hướng nghiệp</h1>
+
+        <!-- Context card -->
+        <div class="test-section"
+          style="background: rgba(26, 60, 255, 0.1); border-color: rgba(26, 60, 255, 0.3); margin-bottom: 2rem;">
+          <h3 style="margin-top: 0;">📋 Hồ sơ của bạn</h3>
+          <div id="chatContext" style="color: #9fb7ff;">Chưa có dữ liệu. Vui lòng làm trắc nghiệm trước.</div>
+        </div>
+
+        <!-- Chat UI -->
+        <div id="chatContainer"
+          style="border: 1px solid rgba(30, 42, 68, 0.5); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: 700px; background: rgba(8, 18, 37, 0.8);">
+          <!-- Messages -->
+          <div id="messagesBox"
+            style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+            <div style="color: #9fb7ff; font-size: 0.9rem;">
+              <strong>🤖 AI:</strong> Xin chào! Tôi sẵn sàng tư vấn cho bạn dựa trên kết quả RIASEC. Nhấn nút "Yêu cầu
+              tư vấn" bên dưới để bắt đầu.
+            </div>
+          </div>
+
+          <!-- Input area -->
+          <div style="border-top: 1px solid rgba(30, 42, 68, 0.5); padding: 1rem; display: flex; gap: 0.75rem;">
+            <input type="text" id="chatInput" placeholder="Hỏi AI về hướng nghiệp của bạn..."
+              style="flex: 1; padding: 0.75rem; border-radius: 8px; border: 1px solid #2a3b66; background: #081225; color: #fff;">
+            <button class="btn btn-primary" onclick="sendChatMessage()" style="padding: 0.75rem 1.5rem;">Gửi</button>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center;">
+          <button class="btn btn-primary" id="consultBtn" onclick="requestCounsel()">✨ Yêu cầu tư vấn</button>
+          <button class="btn btn-secondary" onclick="goPage('results')">← Quay lại kết quả</button>
+        </div>
+
+        <div id="loadingIndicator" style="text-align: center; color: #9fb7ff; margin-top: 1rem; display: none;">
+          <span>⏳ Đang chờ AI phản hồi...</span>
+        </div>
       </div>
+    </section>
 
-      <div id="loadingIndicator" style="text-align: center; color: #9fb7ff; margin-top: 1rem; display: none;">
-        <span>⏳ Đang chờ AI phản hồi...</span>
+    <!-- DASHBOARD -->
+    <section class="page" id="dashboard">
+      <h1 style="margin-top: 3rem; margin-bottom: 2rem;">Thống kê & Quản lý dữ liệu</h1>
+      <div id="dashboardContent"></div>
+      <div style="text-align: center; margin-top: 3rem; margin-bottom: 3rem;">
+        <button class="btn btn-secondary" onclick="clearAllData()">Xoá tất cả dữ liệu</button>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- DASHBOARD -->
-  <section class="page" id="dashboard">
-    <h1 style="margin-top: 3rem; margin-bottom: 2rem;">Thống kê & Quản lý dữ liệu</h1>
-    <div id="dashboardContent"></div>
-    <div style="text-align: center; margin-top: 3rem; margin-bottom: 3rem;">
-      <button class="btn btn-secondary" onclick="clearAllData()">Xoá tất cả dữ liệu</button>
-    </div>
-  </section>
+  </div>
 
-</div>
+  <script>
+    // ===== CONFIG & CONSTANTS =====
+    const DB_KEY = 'careerVR_records';
+    const RIASEC_KEY = 'careerVR_current';
 
-<script>
-  // ===== CONFIG & CONSTANTS =====
-  const DB_KEY = 'careerVR_records';
-  const RIASEC_KEY = 'careerVR_current';
+    // RIASEC questions (50 total)
+    const RIASEC_QUESTIONS = [
+      // R – REALISTIC (1-4)
+      { q: "Tôi thích sửa chữa, lắp ráp đồ đạc hoặc thiết bị.", r: "R" },
+      { q: "Tôi hứng thú với các công việc cần vận động hoặc làm ngoài trời.", r: "R" },
+      { q: "Tôi thích làm việc với công cụ, máy móc hơn là giấy tờ.", r: "R" },
+      { q: "Tôi học tốt hơn khi được làm trực tiếp thay vì chỉ nghe giảng.", r: "R" },
+      // I – INVESTIGATIVE (5-8)
+      { q: "Tôi thích tìm hiểu nguyên nhân – kết quả của một vấn đề.", r: "I" },
+      { q: "Tôi thích các môn học cần suy luận như Toán, Lý, Hóa.", r: "I" },
+      { q: "Tôi thường đặt câu hỏi \"vì sao\" khi học kiến thức mới.", r: "I" },
+      { q: "Tôi thích phân tích dữ liệu, thí nghiệm hoặc nghiên cứu.", r: "I" },
+      // A – ARTISTIC (9-12)
+      { q: "Tôi thích vẽ, viết, thiết kế hoặc sáng tạo nội dung.", r: "A" },
+      { q: "Tôi không thích công việc quá khuôn mẫu, lặp lại.", r: "A" },
+      { q: "Tôi thích thể hiện ý tưởng và cảm xúc cá nhân.", r: "A" },
+      { q: "Tôi hứng thú với âm nhạc, mỹ thuật hoặc truyền thông.", r: "A" },
+      // S – SOCIAL (13-16)
+      { q: "Tôi thích giúp đỡ, hướng dẫn hoặc hỗ trợ người khác.", r: "S" },
+      { q: "Tôi cảm thấy vui khi làm việc nhóm.", r: "S" },
+      { q: "Tôi có xu hướng lắng nghe và chia sẻ với mọi người.", r: "S" },
+      { q: "Tôi thích các công việc liên quan đến giáo dục, y tế hoặc xã hội.", r: "S" },
+      // E – ENTERPRISING (17-20)
+      { q: "Tôi thích lãnh đạo hoặc thuyết phục người khác.", r: "E" },
+      { q: "Tôi hứng thú với kinh doanh, bán hàng hoặc tổ chức hoạt động.", r: "E" },
+      { q: "Tôi tự tin khi trình bày ý kiến trước đám đông.", r: "E" },
+      { q: "Tôi thích đặt mục tiêu và chinh phục kết quả.", r: "E" },
+      // C – CONVENTIONAL (21-24)
+      { q: "Tôi thích công việc rõ ràng, có quy trình cụ thể.", r: "C" },
+      { q: "Tôi cẩn thận với số liệu, hồ sơ và giấy tờ.", r: "C" },
+      { q: "Tôi thích làm việc có kế hoạch, thời gian biểu rõ ràng.", r: "C" },
+      { q: "Tôi cảm thấy yên tâm khi mọi việc được sắp xếp gọn gàng.", r: "C" },
+      // NĂNG LỰC & KỸ NĂNG (25-38)
+      { q: "Tôi học tốt hơn khi được thực hành, thao tác trực tiếp.", r: "R" },
+      { q: "Tôi học tốt các môn cần tư duy logic và phân tích.", r: "I" },
+      { q: "Tôi sử dụng máy tính và phần mềm học tập một cách hiệu quả.", r: "E" },
+      { q: "Tôi giao tiếp và trình bày ý kiến khá tự tin.", r: "S" },
+      { q: "Tôi làm tốt các công việc cần thao tác tay hoặc kỹ thuật.", r: "R" },
+      { q: "Tôi tiếp thu nhanh khi được quan sát và làm thử.", r: "R" },
+      { q: "Tôi có khả năng phân tích vấn đề và tìm cách giải quyết.", r: "I" },
+      { q: "Tôi thích các nhiệm vụ cần suy luận, tính toán.", r: "I" },
+      { q: "Tôi có khả năng sáng tạo ý tưởng mới.", r: "A" },
+      { q: "Tôi thường có cách làm riêng, không thích bị bó buộc.", r: "A" },
+      { q: "Tôi có khả năng lắng nghe và hỗ trợ người khác.", r: "S" },
+      { q: "Tôi cảm thấy thoải mái khi làm việc nhóm.", r: "S" },
+      { q: "Tôi tự tin đưa ra ý kiến và dẫn dắt nhóm.", r: "E" },
+      { q: "Tôi làm việc hiệu quả khi có kế hoạch rõ ràng.", r: "C" },
+      // GIÁ TRỊ NGHỀ NGHIỆP (39-46)
+      { q: "Tôi coi trọng việc nghề nghiệp mang lại thu nhập và cơ hội thăng tiến.", r: "E" },
+      { q: "Tôi mong muốn công việc ổn định, lâu dài.", r: "C" },
+      { q: "Tôi muốn nghề nghiệp có ích cho xã hội và cộng đồng.", r: "S" },
+      { q: "Tôi coi trọng sự sáng tạo trong công việc.", r: "A" },
+      { q: "Tôi muốn nghề nghiệp giúp tôi phát triển bản thân.", r: "I" },
+      { q: "Tôi thích môi trường làm việc linh hoạt, không gò bó.", r: "A" },
+      { q: "Tôi coi trọng việc không ngừng học hỏi và nâng cao kiến thức.", r: "C" },
+      { q: "Tôi mong muốn công việc phản ánh giá trị cá nhân và có ý nghĩa.", r: "E" },
+      // ĐIỀU KIỆN THỰC TẾ (47-50)
+      { q: "Tôi sẵn sàng học tập dài hạn để theo đuổi nghề phù hợp.", r: "I" },
+      { q: "Điều kiện tài chính gia đình cho phép tôi học tập có kế hoạch.", r: "C" },
+      { q: "Gia đình ủng hộ và tôn trọng lựa chọn nghề nghiệp của tôi.", r: "S" },
+      { q: "Tôi sẵn sàng lập kế hoạch cụ thể để theo đuổi nghề đã chọn.", r: "E" }
+    ];
 
-  // Dummy RIASEC questions (50 total)
-  const RIASEC_QUESTIONS = [
-    { q: "Tôi thích làm việc với các công cụ thủ công", r: "R" },
-    { q: "Tôi thích giải quyết các bài toán phức tạp", r: "I" },
-    { q: "Tôi thích sáng tạo và biểu đạt bản thân", r: "A" },
-    { q: "Tôi thích giúp đỡ người khác", r: "S" },
-    { q: "Tôi thích lãnh đạo và có ảnh hưởng", r: "E" },
-    { q: "Tôi thích công việc có quy tắc rõ ràng", r: "C" },
-    { q: "Tôi cảm thấy thoải mái khi làm công việc thực tế", r: "R" },
-    { q: "Tôi hứng thú với khoa học và nghiên cứu", r: "I" },
-    { q: "Tôi thích tham gia các hoạt động sáng tạo", r: "A" },
-    { q: "Tôi thích học hỏi từ người khác", r: "S" },
-    { q: "Tôi có khả năng thuyết phục người khác", r: "E" },
-    { q: "Tôi luôn cẩn thận với chi tiết", r: "C" },
-    { q: "Tôi thích công việc ngoài trời", r: "R" },
-    { q: "Tôi thích tìm hiểu cách mọi thứ hoạt động", r: "I" },
-    { q: "Tôi yêu thích âm nhạc, nghệ thuật hoặc văn học", r: "A" },
-    { q: "Tôi thích làm việc nhóm", r: "S" },
-    { q: "Tôi thích đề ra kế hoạch và tổ chức", r: "E" },
-    { q: "Tôi thích công việc cần sự chính xác", r: "C" },
-    { q: "Tôi thích sửa chữa các vật dụng", r: "R" },
-    { q: "Tôi thích sử dụng máy tính hoặc công nghệ", r: "I" },
-    { q: "Tôi thích thiết kế hoặc trang trí", r: "A" },
-    { q: "Tôi thích chăm sóc người khác", r: "S" },
-    { q: "Tôi thích công việc về giao dịch thương mại", r: "E" },
-    { q: "Tôi thích sắp xếp và quản lý tài liệu", r: "C" },
-    { q: "Tôi thích các hoạt động khám phá", r: "R" },
-    { q: "Tôi thích phân tích dữ liệu", r: "I" },
-    { q: "Tôi thích viết hoặc kể chuyện", r: "A" },
-    { q: "Tôi thích giáo dục những người khác", r: "S" },
-    { q: "Tôi thích khởi động các dự án mới", r: "E" },
-    { q: "Tôi thích tuân theo quy trình tiêu chuẩn", r: "C" },
-    { q: "Tôi có kỹ năng cơ khí tốt", r: "R" },
-    { q: "Tôi thích học tập liên tục", r: "I" },
-    { q: "Tôi thích diễn đạt ý tưởng của mình", r: "A" },
-    { q: "Tôi quan tâm đến phúc lợi của người khác", r: "S" },
-    { q: "Tôi thích buôn bán hoặc kinh doanh", r: "E" },
-    { q: "Tôi thích công việc có cấu trúc", r: "C" },
-    { q: "Tôi thích làm việc trực tiếp trên các dự án", r: "R" },
-    { q: "Tôi có sở thích mạnh về tự nhiên", r: "I" },
-    { q: "Tôi thích thử nghiệm những cách tiếp cận mới", r: "A" },
-    { q: "Tôi thích lắng nghe những người khác", r: "S" },
-    { q: "Tôi thích quản lý một nhóm người", r: "E" },
-    { q: "Tôi thích công việc yêu cầu chuyên môn cao", r: "C" },
-    { q: "Tôi yêu thích các đồ vật có hình dáng và kết cấu", r: "R" },
-    { q: "Tôi thích sử dụng toán học trong công việc", r: "I" },
-    { q: "Tôi thích biểu diễn cảm xúc qua nghệ thuật", r: "A" },
-    { q: "Tôi thích hỗ trợ những người gặp khó khăn", r: "S" },
-    { q: "Tôi thích nắm quyền kiểm soát", r: "E" },
-    { q: "Tôi thích công việc lặp đi lặp lại nhưng quan trọng", r: "C" },
-    { q: "Tôi thích lao động chân tay", r: "R" },
-    { q: "Tôi thích khám phá các ý tưởng trừu tượng", r: "I" }
-  ];
+    // Dummy major recommendations
+    const MAJORS_DB = {
+      "R-I-A": [
+        { name: "Kiến trúc", code: "7310", path: "ĐH Kiến trúc (4 năm)" },
+        { name: "Thiết kế nội thất", code: "7220", path: "ĐH Mỹ thuật ứng dụng (4 năm)" }
+      ],
+      "I-R-A": [
+        { name: "Khoa học máy tính", code: "7480", path: "ĐH Công nghệ thông tin (4 năm)" },
+        { name: "Kỹ thuật phần mềm", code: "7310", path: "ĐH Kỹ thuật (4 năm)" }
+      ],
+      "S-E-C": [
+        { name: "Quản trị kinh doanh", code: "7340", path: "ĐH Kinh tế (4 năm)" },
+        { name: "Tâm lý học", code: "7320", path: "ĐH Sư phạm (4 năm)" }
+      ],
+      "E-C-S": [
+        { name: "Marketing & Bán hàng", code: "7360", path: "ĐH Ngoại thương (4 năm)" },
+        { name: "Quản lý nhân sự", code: "7340", path: "ĐH Kinh tế (4 năm)" }
+      ]
+    };
 
-  // Dummy major recommendations
-  const MAJORS_DB = {
-    "R-I-A": [
-      { name: "Kiến trúc", code: "7310", path: "ĐH Kiến trúc (4 năm)" },
-      { name: "Thiết kế nội thất", code: "7220", path: "ĐH Mỹ thuật ứng dụng (4 năm)" }
-    ],
-    "I-R-A": [
-      { name: "Khoa học máy tính", code: "7480", path: "ĐH Công nghệ thông tin (4 năm)" },
-      { name: "Kỹ thuật phần mềm", code: "7310", path: "ĐH Kỹ thuật (4 năm)" }
-    ],
-    "S-E-C": [
-      { name: "Quản trị kinh doanh", code: "7340", path: "ĐH Kinh tế (4 năm)" },
-      { name: "Tâm lý học", code: "7320", path: "ĐH Sư phạm (4 năm)" }
-    ],
-    "E-C-S": [
-      { name: "Marketing & Bán hàng", code: "7360", path: "ĐH Ngoại thương (4 năm)" },
-      { name: "Quản lý nhân sự", code: "7340", path: "ĐH Kinh tế (4 năm)" }
-    ]
-  };
+    // ===== UTILS =====
+    const $ = (id) => document.getElementById(id);
+    const readDB = () => JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+    const writeDB = (arr) => localStorage.setItem(DB_KEY, JSON.stringify(arr));
+    const readCurrent = () => JSON.parse(localStorage.getItem(RIASEC_KEY) || 'null');
+    const writeCurrent = (obj) => localStorage.setItem(RIASEC_KEY, JSON.stringify(obj));
 
-  // ===== UTILS =====
-  const $ = (id) => document.getElementById(id);
-  const readDB = () => JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-  const writeDB = (arr) => localStorage.setItem(DB_KEY, JSON.stringify(arr));
-  const readCurrent = () => JSON.parse(localStorage.getItem(RIASEC_KEY) || 'null');
-  const writeCurrent = (obj) => localStorage.setItem(RIASEC_KEY, JSON.stringify(obj));
+    // ===== PAGE NAVIGATION =====
+    function goPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      $(page).classList.add('active');
 
-  // ===== PAGE NAVIGATION =====
-  function goPage(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    $(page).classList.add('active');
+      document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+      document.querySelector(`[data-page="${page}"]`).classList.add('active');
 
-    document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
-    document.querySelector(`[data-page="${page}"]`).classList.add('active');
+      if (page === 'results') showResults();
+      if (page === 'dashboard') showDashboard();
+    }
 
-    if (page === 'results') showResults();
-    if (page === 'dashboard') showDashboard();
-  }
+    // ===== INIT TEST PAGE =====
+    function initTest() {
+      const container = $('questionsContainer');
+      container.innerHTML = '';
 
-  // ===== INIT TEST PAGE =====
-  function initTest() {
-    const container = $('questionsContainer');
-    container.innerHTML = '';
-
-    RIASEC_QUESTIONS.forEach((q, idx) => {
-      const html = `
+      RIASEC_QUESTIONS.forEach((q, idx) => {
+        const html = `
         <div class="question-item">
           <label>Câu ${idx + 1}. ${q.q}</label>
           <div class="answer-options">
@@ -826,86 +934,100 @@
           </div>
         </div>
       `;
-      container.innerHTML += html;
-    });
-  }
-
-  // ===== PROGRESS TRACKING =====
-  function updateProgress() {
-    const answered = document.querySelectorAll('input[type="radio"]:checked').length;
-    const total = 50;
-    const percent = (answered / total) * 100;
-
-    $('progressFill').style.width = percent + '%';
-    $('progressText').textContent = `${answered} / ${total} câu`;
-
-    if (answered === total) {
-      $('estimatedTime').textContent = '✅ Sẵn sàng nộp';
+        container.innerHTML += html;
+      });
     }
-  }
 
-  // ===== CALCULATE RIASEC SCORES =====
-  function calculateRIASEC() {
-    const scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
-    let answered = 0;
+    // ===== PROGRESS TRACKING =====
+    function updateProgress() {
+      const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+      const total = 50;
+      const percent = (answered / total) * 100;
 
-    RIASEC_QUESTIONS.forEach((q, idx) => {
-      const value = parseInt(document.querySelector(`input[name="q${idx}"]:checked`)?.value) || 0;
-      if (value) {
-        scores[q.r] += value;
-        answered++;
+      $('progressFill').style.width = percent + '%';
+      $('progressText').textContent = `${answered} / ${total} câu`;
+
+      if (answered === total) {
+        $('estimatedTime').textContent = '✅ Sẵn sàng nộp';
       }
+    }
+
+    // ===== CALCULATE RIASEC SCORES =====
+    function calculateRIASEC() {
+      const answers = [];
+      for (let i = 0; i < 50; i++) {
+        const value = parseInt(document.querySelector(`input[name="q${i}"]:checked`)?.value) || 0;
+        answers.push(value);
+      }
+
+      if (!answers.every(v => v > 0)) {
+        alert('Vui lòng trả lời hết 50 câu!');
+        return null;
+      }
+
+      // ===== MATCH BACKEND LOGIC =====
+      // Part 1: Base (Q1-24)
+      let R = answers[0] + answers[1] + answers[2] + answers[3];
+      let I = answers[4] + answers[5] + answers[6] + answers[7];
+      let A = answers[8] + answers[9] + answers[10] + answers[11];
+      let S = answers[12] + answers[13] + answers[14] + answers[15];
+      let E = answers[16] + answers[17] + answers[18] + answers[19];
+      let C = answers[20] + answers[21] + answers[22] + answers[23];
+
+      // Part 2: Skills (Q25-38)
+      R += answers[24] + answers[28] + answers[29];
+      I += answers[25] + answers[30] + answers[31];
+      A += answers[32] + answers[33] + answers[41];
+      S += answers[27] + answers[34] + answers[35];
+      E += answers[26] + answers[36] + answers[37];
+      C += answers[38] + answers[39] + answers[44];
+
+      const scores = { R, I, A, S, E, C };
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+      const top3 = sorted.slice(0, 3).map(x => x[0]);
+
+      return { scores, top3, answered: 50, raw_answers: answers };
+    }
+
+    // ===== SUBMIT TEST =====
+    $('testForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const result = calculateRIASEC();
+      if (!result) return;
+
+      const record = {
+        name: $('name').value || 'Ẩn danh',
+        class: $('class').value || '-',
+        school: $('school').value || '-',
+        riasec: result.top3,
+        scores: result.scores,
+        answers: result.raw_answers,
+        time: new Date().toISOString()
+      };
+
+      const db = readDB();
+      db.push(record);
+      writeDB(db);
+      writeCurrent(record);
+
+      goPage('results');
     });
 
-    if (answered !== 50) {
-      alert('Vui lòng trả lời hết 50 câu!');
-      return null;
-    }
+    // ===== SHOW RESULTS =====
+    function showResults() {
+      const current = readCurrent();
+      if (!current) {
+        $('majorContainer').innerHTML = '<div class="empty-state">Vui lòng làm trắc nghiệm trước</div>';
+        return;
+      }
 
-    const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-    const top3 = sorted.slice(0, 3).map(x => x[0]);
+      $('riasecDisplay').textContent = current.riasec.join('-');
+      $('resultTime').textContent = `Ngày: ${new Date(current.time).toLocaleDateString('vi-VN')}`;
 
-    return { scores, top3, answered };
-  }
+      const key = current.riasec.join('-');
+      const majors = MAJORS_DB[key] || MAJORS_DB['S-E-C'];
 
-  // ===== SUBMIT TEST =====
-  $('testForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const result = calculateRIASEC();
-    if (!result) return;
-
-    const record = {
-      name: $('name').value || 'Ẩn danh',
-      class: $('class').value || '-',
-      school: $('school').value || '-',
-      riasec: result.top3,
-      scores: result.scores,
-      time: new Date().toISOString()
-    };
-
-    const db = readDB();
-    db.push(record);
-    writeDB(db);
-    writeCurrent(record);
-
-    goPage('results');
-  });
-
-  // ===== SHOW RESULTS =====
-  function showResults() {
-    const current = readCurrent();
-    if (!current) {
-      $('majorContainer').innerHTML = '<div class="empty-state">Vui lòng làm trắc nghiệm trước</div>';
-      return;
-    }
-
-    $('riasecDisplay').textContent = current.riasec.join('-');
-    $('resultTime').textContent = `Ngày: ${new Date(current.time).toLocaleDateString('vi-VN')}`;
-
-    const key = current.riasec.join('-');
-    const majors = MAJORS_DB[key] || MAJORS_DB['S-E-C'];
-
-    const html = majors.map((m, idx) => `
+      const html = majors.map((m, idx) => `
       <div class="major-card rank-${idx + 1}">
         <div class="major-badge">Gợi ý #${idx + 1}</div>
         <h3>${m.name}</h3>
@@ -914,24 +1036,24 @@
       </div>
     `).join('');
 
-    $('majorContainer').innerHTML = html;
-  }
-
-  // ===== SHOW DASHBOARD =====
-  function showDashboard() {
-    const db = readDB();
-    if (!db.length) {
-      $('dashboardContent').innerHTML = '<div class="empty-state">Chưa có dữ liệu. Hãy làm trắc nghiệm trước.</div>';
-      return;
+      $('majorContainer').innerHTML = html;
     }
 
-    const stats = {};
-    db.forEach(r => {
-      const key = r.school || 'Không rõ';
-      stats[key] = (stats[key] || 0) + 1;
-    });
+    // ===== SHOW DASHBOARD =====
+    function showDashboard() {
+      const db = readDB();
+      if (!db.length) {
+        $('dashboardContent').innerHTML = '<div class="empty-state">Chưa có dữ liệu. Hãy làm trắc nghiệm trước.</div>';
+        return;
+      }
 
-    const html = `
+      const stats = {};
+      db.forEach(r => {
+        const key = r.school || 'Không rõ';
+        stats[key] = (stats[key] || 0) + 1;
+      });
+
+      const html = `
       <div class="dashboard-grid">
         <div class="dashboard-card">
           <h3>📊 Tổng số bài làm</h3>
@@ -952,43 +1074,55 @@
       </div>
     `;
 
-    $('dashboardContent').innerHTML = html;
-  }
-
-  // ===== RESET TEST =====
-  function resetTest() {
-    if (!confirm('Xoá hết dữ liệu nhập liệu?')) return;
-    document.getElementById('testForm').reset();
-    $('progressFill').style.width = '0%';
-    $('progressText').textContent = '0 / 50 câu';
-    $('estimatedTime').textContent = '~10 phút';
-  }
-
-  // ===== CLEAR ALL DATA =====
-  function clearAllData() {
-    if (!confirm('Xoá tất cả dữ liệu lưu trữ? Hành động này không thể hoàn tác.')) return;
-    writeDB([]);
-    writeCurrent(null);
-    showDashboard();
-    alert('Đã xoá tất cả dữ liệu');
-  }
-
-  // ===== CHATBOT =====
-  // Use relative URL - works on localhost and production
-  const API_BASE = window.location.origin;
-
-  function updateChatContext() {
-    const current = readCurrent();
-    const ctx = $('chatContext');
-    if (!ctx) return;
-
-    if (!current) {
-      ctx.innerHTML = '❌ Chưa có dữ liệu. Vui lòng <strong onclick="goPage(\'test\')">làm trắc nghiệm</strong> trước.';
-      $('consultBtn').disabled = true;
-      return;
+      $('dashboardContent').innerHTML = html;
     }
 
-    ctx.innerHTML = `
+    // ===== RESET TEST =====
+    function resetTest() {
+      if (!confirm('Xoá hết dữ liệu nhập liệu?')) return;
+      document.getElementById('testForm').reset();
+      $('progressFill').style.width = '0%';
+      $('progressText').textContent = '0 / 50 câu';
+      $('estimatedTime').textContent = '~10 phút';
+
+      // Clear chat session
+      sessionStorage.removeItem('conversation_id');
+      const msgBox = $('messagesBox');
+      if (msgBox) msgBox.innerHTML = '<div style="color: #9fb7ff; font-size: 0.9rem;"><strong>🤖 AI:</strong> Xin chào! Tôi sẵn sàng tư vấn cho bạn dựa trên kết quả RIASEC. Nhấn nút "Bắt đầu tư vấn" bên dưới để bắt đầu.</div>';
+    }
+
+    // ===== CLEAR ALL DATA =====
+    function clearAllData() {
+      if (!confirm('Xoá tất cả dữ liệu lưu trữ? Hành động này không thể hoàn tác.')) return;
+      writeDB([]);
+      writeCurrent(null);
+      sessionStorage.removeItem('conversation_id');
+      showDashboard();
+      alert('Đã xoá tất cả dữ liệu');
+    }
+
+    // ===== CHATBOT =====
+    // Use relative URL - works on localhost and production
+    const API_BASE = window.location.origin;
+
+    function updateChatContext() {
+      const current = readCurrent();
+      const ctx = $('chatContext');
+      if (!ctx) return;
+
+      if (!current) {
+        ctx.innerHTML = '❌ Chưa có dữ liệu. Vui lòng <strong onclick="goPage(\'test\')">làm trắc nghiệm</strong> trước.';
+        return;
+      }
+
+      // Check if we have an active session
+      if (sessionStorage.getItem('conversation_id')) {
+        $('consultBtn').textContent = "🔄 Bắt đầu lại cuộc hội thoại";
+      } else {
+        $('consultBtn').textContent = "✨ Bắt đầu tư vấn";
+      }
+
+      ctx.innerHTML = `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
         <div>
           <strong>👤 Học sinh:</strong> ${current.name || 'Ẩn danh'}
@@ -1004,159 +1138,250 @@
         </div>
       </div>
     `;
-    $('consultBtn').disabled = false;
-  }
-
-  function formatMarkdownText(text) {
-    // Convert markdown-style formatting to HTML
-    let html = text
-      // Bold: **text** → <strong>text</strong>
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Line breaks: preserve them
-      .replace(/\n/g, '<br>')
-      // Headers: Roman numerals + ALL CAPS
-      .replace(/^(I+\..*?)$/gm, '<h4 style="margin: 1rem 0 0.5rem 0; color: #cfe0ff; font-size: 1rem;">$1</h4>')
-      // Numbered lists: 1. → formatted list
-      .replace(/^(\d+\.\s)/gm, '<div style="margin-left: 1rem; margin-bottom: 0.5rem;">$1')
-      // Close numbered list items
-      .replace(/(<div style="margin-left: 1rem;.*?)<br>/g, '$1</div><br>')
-      // Dashes to bullet points: - → •
-      .replace(/^- /gm, '&nbsp;&nbsp;• ');
-    
-    return html;
-  }
-
-  function addChatMessage(sender, text, isLoading = false) {
-    const messagesBox = $('messagesBox');
-    const msg = document.createElement('div');
-    msg.style.cssText = 'color: #9fb7ff; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem; white-space: pre-wrap; word-wrap: break-word;';
-
-    if (sender === 'user') {
-      msg.innerHTML = `<strong style="color: #cfe0ff;">👤 Bạn:</strong> ${text}`;
-    } else {
-      const formattedText = formatMarkdownText(text);
-      msg.innerHTML = `<div style="color: #4d7cff;"><strong>🤖 AI:</strong></div><div style="margin-top: 0.5rem; color: #9fb7ff;">${isLoading ? '<em>Đang suy nghĩ...</em>' : formattedText}</div>`;
+      $('consultBtn').disabled = false;
     }
 
-    messagesBox.appendChild(msg);
-    messagesBox.scrollTop = messagesBox.scrollHeight;
-  }
-
-  async function requestCounsel() {
-    const current = readCurrent();
-    if (!current) {
-      alert('Vui lòng làm trắc nghiệm trước');
-      return;
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    const $consultBtn = $('consultBtn');
-    const $loadingIndicator = $('loadingIndicator');
+    function formatMarkdownText(text) {
+      // First escape HTML to prevent broken tags
+      let safeText = escapeHtml(text);
 
-    $consultBtn.disabled = true;
-    $loadingIndicator.style.display = 'block';
+      // Convert markdown-style formatting to HTML
+      let html = safeText
+        // Bold: **text** → <strong>text</strong>
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Headers: Roman numerals + ALL CAPS
+        .replace(/^(I+\..*?)$/gm, '<h4 style="margin: 1rem 0 0.5rem 0; color: #cfe0ff; font-size: 1rem;">$1</h4>')
+        // Numbered lists: 1. → formatted list
+        .replace(/^(\d+\.\s)(.*)$/gm, '<div style="margin-left: 1rem; margin-bottom: 0.5rem;">$1$2</div>')
+        // Dashes to bullet points: - → •
+        .replace(/^- /gm, '&nbsp;&nbsp;• ')
+        // Line breaks: Apply LAST to preserve regex anchors (^ $)
+        .replace(/\n/g, '<br>');
 
-    try {
-      // Build answer array: reconstruct from RIASEC scores proportionally
-      const answerArray = [];
-      const scores = current.scores;
-      const letters = ['R', 'I', 'A', 'S', 'E', 'C'];
-      let answerIdx = 0;
+      return html;
+    }
 
-      // Distribute answers based on original RIASEC allocation (50 questions total)
-      for (let i = 0; i < 50; i++) {
-        const letterIdx = i % 6;
-        const letter = letters[letterIdx];
-        const baseScore = Math.round(scores[letter] / 6);
-        const variance = Math.floor(Math.random() * 2) - 1;
-        answerArray.push(Math.max(1, Math.min(5, baseScore + variance)));
+    function addChatMessage(sender, text, isLoading = false) {
+      const messagesBox = $('messagesBox');
+      const msg = document.createElement('div');
+      msg.style.cssText = 'color: #9fb7ff; font-size: 0.95rem; line-height: 1.8; margin-bottom: 1rem; white-space: pre-wrap; word-wrap: break-word;';
+
+      if (sender === 'user') {
+        msg.innerHTML = `<strong style="color: #cfe0ff;">👤 Bạn:</strong> ${escapeHtml(text)}`;
+      } else {
+        const formattedText = formatMarkdownText(text);
+        msg.innerHTML = `<div style="color: #4d7cff;"><strong>🤖 AI:</strong></div><div style="margin-top: 0.5rem; color: #9fb7ff;">${isLoading ? '<em>Đang suy nghĩ...</em>' : formattedText}</div>`;
       }
 
-      console.log('📤 Sending to API:', {
-        name: current.name,
-        class: current.class,
-        school: current.school,
-        answers_json: answerArray
-      });
+      messagesBox.appendChild(msg);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
 
-      const response = await fetch(`${API_BASE}/run-riasec`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: current.name || 'Ẩn danh',
-          class: current.class || '-',
-          school: current.school || '-',
-          answers_json: answerArray
-        })
-      });
-
-      if (!response.ok) {
-        let errorMsg = `HTTP ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMsg = errorData.detail || errorMsg;
-        } catch (e) {}
-        throw new Error(errorMsg);
+    async function requestCounsel() {
+      const current = readCurrent();
+      if (!current) {
+        alert('Vui lòng làm trắc nghiệm trước');
+        return;
       }
 
-      const data = await response.json();
-      const aiResponse = data.data.outputs.text || 'Không có phản hồi từ AI';
+      const $consultBtn = $('consultBtn');
+      const $loadingOverlay = $('loadingOverlay');
 
-      addChatMessage('ai', aiResponse);
-    } catch (err) {
-      console.error('❌ Fetch error:', err);
-      const errorMsg = err.message;
-      
-      if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
-        addChatMessage('ai', `
+      $consultBtn.disabled = true;
+      $loadingOverlay.classList.add('active');
+
+      try {
+        // Use actual answers if available, otherwise fallback (for old data) but warn
+        let answerArray = current.answers;
+
+        if (!answerArray || answerArray.length !== 50) {
+          console.warn("Missing raw answers in storage, attempting partial reconstruction (Not recommended for consistency)");
+          // Fallback logic could go here, but better to alert user
+          // For now we keep the old logic ONLY as a fallback for legacy local data
+          answerArray = [];
+          const scores = current.scores;
+          const letters = ['R', 'I', 'A', 'S', 'E', 'C'];
+          for (let i = 0; i < 50; i++) {
+            const letterIdx = i % 6;
+            const letter = letters[letterIdx];
+            const baseScore = Math.round(scores[letter] / 6);
+            answerArray.push(Math.max(1, Math.min(5, baseScore)));
+          }
+        }
+
+        console.log('📤 Sending to API:', {
+          name: current.name,
+          class: current.class,
+          school: current.school,
+          answer: answerArray
+        });
+
+        const response = await fetch(`${API_BASE}/start-conversation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: current.name || 'Ẩn danh',
+            class: current.class || '-',
+            school: current.school || '-',
+            answer: answerArray,
+            answer: answerArray,
+            initial_question: "Hãy giới thiệu về các hướng nghiệp phù hợp cho tôi dựa trên kết quả RIASEC của tôi. Hãy trả lời súc tích, ngắn gọn, đảm bảo không bị cắt ngang giữa chừng."
+          })
+        });
+
+        if (!response.ok) {
+          let errorMsg = `HTTP ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.detail || errorMsg;
+          } catch (e) { }
+          throw new Error(errorMsg);
+        }
+
+        const data = await response.json();
+        console.log('📥 API Response:', data);
+
+        const aiResponse = data.ai_response || 'Không có phản hồi từ AI';
+        const conversationId = data.conversation_id;
+
+        // Store conversation ID for future messages
+        if (conversationId) {
+          sessionStorage.setItem('conversation_id', conversationId);
+        }
+
+        // Clear previous messages if starting new
+        $('messagesBox').innerHTML = '';
+
+        // Show the initial question from user
+        addChatMessage('user', "Hãy giới thiệu về các hướng nghiệp phù hợp cho tôi dựa trên kết quả RIASEC của tôi");
+
+        addChatMessage('ai', aiResponse);
+
+        // Update button state
+        $consultBtn.textContent = "🔄 Bắt đầu lại cuộc hội thoại";
+      } catch (err) {
+        console.error('❌ Fetch error:', err);
+        const errorMsg = err.message;
+
+        if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+          addChatMessage('ai', `
           ❌ <strong>Lỗi kết nối:</strong> Không thể kết nối tới backend API (${API_BASE}).<br><br>
           <strong>Cách khắc phục:</strong><br>
           1. Mở terminal và chạy:<br>
           <code style="background: #081225; padding: 0.25rem 0.5rem; border-radius: 4px;">uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000</code><br>
           2. Sau đó tải lại trang web này
         `);
-      } else {
-        addChatMessage('ai', `❌ <strong>Lỗi API:</strong> ${errorMsg}`);
+        } else {
+          addChatMessage('ai', `❌ <strong>Lỗi API:</strong> ${errorMsg}`);
+        }
+      } finally {
+        $consultBtn.disabled = false;
+        $loadingOverlay.classList.remove('active');
       }
-    } finally {
-      $consultBtn.disabled = false;
-      $loadingIndicator.style.display = 'none';
     }
-  }
 
-  function sendChatMessage() {
-    const input = $('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
+    async function sendChatMessage() {
+      const input = $('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
 
-    addChatMessage('user', text);
-    input.value = '';
+      // Get conversation ID from session
+      const conversationId = sessionStorage.getItem('conversation_id');
+      if (!conversationId) {
+        alert('Vui lòng nhấn "Yêu cầu tư vấn" để bắt đầu cuộc trò chuyện');
+        return;
+      }
 
-    // Placeholder: AI echo response
-    setTimeout(() => {
-      addChatMessage('ai', `Bạn hỏi: "${text}". Tôi đang học cách trả lời câu hỏi này. Vui lòng nhấn "Yêu cầu tư vấn" để nhận phân tích chi tiết.`);
-    }, 500);
-  }
+      addChatMessage('user', text);
+      input.value = '';
 
-  // Enter to send
-  $('chatInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') sendChatMessage();
-  });
+      const $loadingOverlay = $('loadingOverlay');
+      $loadingOverlay.classList.add('active');
 
-  // ===== INIT =====
-  document.querySelectorAll('.nav-link').forEach(a => {
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      const page = a.dataset.page;
-      if (page === 'chatbot') updateChatContext();
-      goPage(page);
+      try {
+        const response = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            conversation_id: conversationId,
+            message: text
+          })
+        });
+
+        if (!response.ok) {
+          let errorMsg = `HTTP ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.detail || errorMsg;
+          } catch (e) { }
+
+          if (response.status === 404) {
+            throw new Error("Cuộc hội thoại đã hết hạn hoặc server đã khởi động lại. Vui lòng nhấn nút 'Bắt đầu lại cuộc hội thoại' để kết nối lại.");
+          }
+          throw new Error(errorMsg);
+        }
+
+        const data = await response.json();
+        const aiResponse = data.ai_response || 'Không có phản hồi từ AI';
+        addChatMessage('ai', aiResponse);
+      } catch (err) {
+        console.error('❌ Chat error:', err);
+        addChatMessage('ai', `❌ <strong>Lỗi:</strong> ${err.message}`);
+      } finally {
+        $loadingOverlay.classList.remove('active');
+      }
+    }
+
+    // Enter to send
+    $('chatInput')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendChatMessage();
     });
-  });
 
-  // Init test page when landing is loaded
-  window.addEventListener('load', () => {
-    initTest();
-  });
-</script>
+    // ===== INIT =====
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const page = a.dataset.page;
+        if (page === 'chatbot') updateChatContext();
+        goPage(page);
+      });
+    });
+
+    // Init test page when landing is loaded
+    window.addEventListener('load', () => {
+      initTest();
+    });
+
+    // ===== DEV UTILS =====
+    function devAutoFill() {
+      // Fill personal info if empty
+      if (!$('name').value) $('name').value = "Dev Tester";
+      if (!$('class').value) $('class').value = "12A Dev";
+      if (!$('school').value) $('school').value = "THPT Dev Mode";
+
+      // Randomly click 50 answers
+      for (let i = 0; i < 50; i++) {
+        const val = Math.floor(Math.random() * 5) + 1; // 1-5
+        const radio = document.getElementById(`q${i}_${val}`);
+        if (radio) {
+          radio.checked = true;
+        }
+      }
+      updateProgress();
+      // Scroll to bottom
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  </script>
 
 </body>
+
 </html>
