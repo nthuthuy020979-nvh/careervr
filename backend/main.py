@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import logging
 from dotenv import load_dotenv
+import uuid
 from riasec_calculator import calculate_riasec, recommend_jobs
 
 # Load environment variables from .env file
