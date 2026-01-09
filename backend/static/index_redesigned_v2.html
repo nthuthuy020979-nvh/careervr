@@ -1297,69 +1297,78 @@
     }
 
     // ===== SHOW DASHBOARD =====
-    function showDashboard() {
-      const db = readDB();
+    async function showDashboard() {
       const $content = $('dashboardContent');
+      $content.innerHTML = '<div style="color: #9fb7ff; text-align: center;">⏳ Đang tải dữ liệu...</div>';
 
-      if (!db.length) {
-        $content.innerHTML = '<div class="empty-state">Chưa có dữ liệu. Hãy làm trắc nghiệm trước.</div>';
-        return;
-      }
+      try {
+        const res = await fetch(`${API_BASE}/api/submissions`);
+        if (!res.ok) throw new Error("Failed to load submissions");
 
-      // Reverse to show latest first
-      const rows = [...db].reverse();
+        const db = await res.json();
 
-      const html = `
-        <div style="overflow-x: auto; background: rgba(15, 31, 58, 0.8); border: 1px solid rgba(30, 42, 68, 0.5); border-radius: 12px; padding: 1rem;">
-          <h3 style="margin-bottom: 1rem; color: #4d7cff;">📋 Danh sách kết quả chi tiết</h3>
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 1000px;">
-            <thead style="background: rgba(26, 60, 255, 0.2); color: #fff;">
-              <tr>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">STT</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Ngày</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Họ tên</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5);">RIASEC</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5); width: 25%;">Các ngành gợi ý</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Tổ hợp xét tuyển</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows.map((row, index) => {
-        const s = row.scores || {};
-        return `
-                <tr style="border-bottom: 1px solid rgba(30, 42, 68, 0.3);">
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${index + 1}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">${new Date(row.time).toLocaleDateString('vi-VN')}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-weight: 500;">
-                    ${row.name || 'Ẩn danh'}<br>
-                    <span style="font-size: 0.8rem; color: #9fb7ff;">${row.class || '-'}</span>
-                  </td>
-                  
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">
-                    <span class="badge" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(77, 124, 255, 0.5);">
-                      ${(row.riasec || []).join('-')}
-                    </span>
-                  </td>
-                  
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
-                    ${row.suggestedMajors || '<i style="color: #666">Chưa có dữ liệu</i>'}
-                  </td>
-                  
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
-                    ${row.combinations || '<i style="color: #666">-</i>'}
-                  </td>
+        if (!db.length) {
+          $content.innerHTML = '<div class="empty-state">Chưa có dữ liệu. Hãy làm trắc nghiệm trước.</div>';
+          return;
+        }
+
+        // Reverse to show latest first
+        const rows = [...db].reverse();
+
+        const html = `
+            <div style="overflow-x: auto; background: rgba(15, 31, 58, 0.8); border: 1px solid rgba(30, 42, 68, 0.5); border-radius: 12px; padding: 1rem;">
+            <h3 style="margin-bottom: 1rem; color: #4d7cff;">📋 Danh sách kết quả chi tiết (Toàn hệ thống)</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 1000px;">
+                <thead style="background: rgba(26, 60, 255, 0.2); color: #fff;">
+                <tr>
+                    <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">STT</th>
+                    <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Ngày</th>
+                    <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Họ tên</th>
+                    <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5);">RIASEC</th>
+                    <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5); width: 25%;">Các ngành gợi ý</th>
+                    <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Tổ hợp xét tuyển</th>
                 </tr>
-                `;
-      }).join('')}
-            </tbody>
-          </table>
-          <div style="margin-top: 1rem; text-align: right;">
-            <span style="font-size: 0.85rem; color: #9fb7ff;">Tổng số bản ghi: <strong>${db.length}</strong></span>
-          </div>
-        </div>
-      `;
+                </thead>
+                <tbody>
+                ${rows.map((row, index) => {
+          const s = row.scores || {};
+          return `
+                    <tr style="border-bottom: 1px solid rgba(30, 42, 68, 0.3);">
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${index + 1}</td>
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">${new Date(row.time).toLocaleDateString('vi-VN')}</td>
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-weight: 500;">
+                        ${row.name || 'Ẩn danh'}<br>
+                        <span style="font-size: 0.8rem; color: #9fb7ff;">${row.class || '-'}</span>
+                    </td>
+                    
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">
+                        <span class="badge" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(77, 124, 255, 0.5);">
+                        ${(row.riasec || []).join('-')}
+                        </span>
+                    </td>
+                    
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
+                        ${row.suggestedMajors || '<i style="color: #666">Chưa có dữ liệu</i>'}
+                    </td>
+                    
+                    <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
+                        ${row.combinations || '<i style="color: #666">-</i>'}
+                    </td>
+                    </tr>
+                    `;
+        }).join('')}
+                </tbody>
+            </table>
+            <div style="margin-top: 1rem; text-align: right;">
+                <span style="font-size: 0.85rem; color: #9fb7ff;">Tổng số bản ghi: <strong>${db.length}</strong></span>
+            </div>
+            </div>
+        `;
+        $content.innerHTML = html;
 
-      $content.innerHTML = html;
+      } catch (e) {
+        $content.innerHTML = `<div class="empty-state" style="color: #ff4d4f;">Lỗi tải dữ liệu: ${e.message}</div>`;
+      }
     }
 
     // ===== RESET TEST =====
@@ -1377,13 +1386,9 @@
     }
 
     // ===== CLEAR ALL DATA =====
+    // Deprecated for Global Data. Replaced with simple local session clear.
     function clearAllData() {
-      if (!confirm('Xoá tất cả dữ liệu lưu trữ? Hành động này không thể hoàn tác.')) return;
-      writeDB([]);
-      writeCurrent(null);
-      sessionStorage.removeItem('conversation_id');
-      showDashboard();
-      alert('Đã xoá tất cả dữ liệu');
+      alert("Dữ liệu hiện được lưu trữ tập trung trên Server nên không thể xoá sạch từ đây.");
     }
 
     // ===== RECOMMENDATION LOGIC HELPER =====
@@ -1432,7 +1437,7 @@
     }
 
     // ===== SUBMIT TEST =====
-    $('testForm').addEventListener('submit', (e) => {
+    $('testForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const result = calculateRIASEC();
       if (!result) return;
@@ -1455,12 +1460,23 @@
         combinations: uniqueCombs
       };
 
-      const db = readDB();
-      db.push(record);
-      writeDB(db);
-      writeCurrent(record);
+      try {
+        const res = await fetch(`${API_BASE}/api/submissions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(record)
+        });
 
-      goPage('results');
+        if (res.ok) {
+          // Also update local current context for the Results page viewing
+          writeCurrent(record);
+          goPage('results');
+        } else {
+          alert("Lỗi khi gửi kết quả lên Server. Vui lòng thử lại.");
+        }
+      } catch (e) {
+        alert("Lỗi kết nối Server: " + e.message);
+      }
     });
 
     // ===== CHATBOT =====
@@ -1764,20 +1780,47 @@
       }
     ];
 
-    // Load jobs
-    function getVRJobs() {
-      return JSON.parse(localStorage.getItem(VR_JOBS_KEY)) || DEFAULT_VR_JOBS;
+    // Global VR Jobs Cache
+    let GLOBAL_VR_JOBS = [];
+
+    // Load jobs from Backend
+    async function fetchVRJobs() {
+      try {
+        const res = await fetch(`${API_BASE}/api/vr-jobs`);
+        if (res.ok) {
+          GLOBAL_VR_JOBS = await res.json();
+          renderVRJobs(); // update UI
+        } else {
+          console.error("Failed to fetch VR jobs");
+        }
+      } catch (e) {
+        console.error("Error fetching VR jobs:", e);
+        // Fallback if needed, or just show empty
+      }
     }
 
-    // Save jobs
-    function saveVRJobs(jobs) {
-      localStorage.setItem(VR_JOBS_KEY, JSON.stringify(jobs));
-      renderVRJobs();
+    // Save jobs to Backend
+    async function saveVRJobs(jobs) {
+      try {
+        const res = await fetch(`${API_BASE}/api/vr-jobs`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(jobs)
+        });
+        if (res.ok) {
+          GLOBAL_VR_JOBS = jobs; // Update local cache
+          renderVRJobs();
+        } else {
+          alert("Lỗi khi lưu dữ liệu lên Server!");
+        }
+      } catch (e) {
+        alert("Lỗi kết nối Server: " + e.message);
+      }
     }
 
-    // Render Grid
+    // Render Grid (Uses Cache)
     function renderVRJobs() {
-      const jobs = getVRJobs();
+      const jobs = GLOBAL_VR_JOBS;
       const container = $('vrGrid');
       const isDev = localStorage.getItem('careervr_dev_mode') === 'true';
 
@@ -1889,7 +1932,10 @@
     }
 
     // Call on load
-    window.addEventListener('load', updateDevModeUI);
+    window.addEventListener('load', () => {
+      updateDevModeUI();
+      fetchVRJobs(); // Initial fetch
+    });
 
     function resetVRData() {
       if (confirm('Bạn có chắc chắn muốn Reset dữ liệu VR về mặc định không?')) {
@@ -1924,7 +1970,7 @@
     }
 
     function editVRJob(id) {
-      const jobs = getVRJobs();
+      const jobs = GLOBAL_VR_JOBS; // Use Cache
       const job = jobs.find(j => j.id === id);
       if (!job) return;
 
@@ -1949,7 +1995,8 @@
         return;
       }
 
-      const jobs = getVRJobs();
+      // Clone current jobs
+      const jobs = [...GLOBAL_VR_JOBS];
 
       if (id === 'new') {
         // Create
@@ -1965,13 +2012,13 @@
         }
       }
 
-      saveVRJobs(jobs);
+      saveVRJobs(jobs); // Async save
       closeDevModal();
     }
 
     function deleteVRJob(id) {
       if (!confirm('Xoá nghề này?')) return;
-      const jobs = getVRJobs().filter(j => j.id !== id);
+      const jobs = GLOBAL_VR_JOBS.filter(j => j.id !== id);
       saveVRJobs(jobs);
     }
 

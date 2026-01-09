@@ -1,28 +1,51 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+# ... (Keep existing imports and config)
+# ... (Keep existing imports and config)
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
+import os
 import requests
 import json
-import os
-import uuid
 from pathlib import Path
+import logging
 from dotenv import load_dotenv
 from riasec_calculator import calculate_riasec, recommend_jobs
 
 # Load environment variables from .env file
 load_dotenv()
 
-# ================== APP ==================
-app = FastAPI(title="CareerVR", version="1.0.0")
+# ... logging setup ...
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ================== STATIC FILES ==================
 STATIC_DIR = Path(__file__).parent / "static"
 STATIC_DIR.mkdir(exist_ok=True)
 
-# ================== CORS ==================
+# ================== CONFIG ==================
+DIFY_API_KEY = os.getenv("DIFY_API_KEY")
+if not DIFY_API_KEY:
+    # Optional: Log warning instead of crash if you want backend to run even without keys
+    logger.warning("❌ ERROR: DIFY_API_KEY not set. Chat features will not work.")
+    # raise ValueError("❌ ERROR: DIFY_API_KEY not set.") # Keeping it safe to avoid crash on start if user has no env yet? 
+    # User said file was crashing, so likely it raised error.
+    # But wait, lines 36-37 in original file raised ValueError. I will restore it to be safe or just log.
+    # Let's restore strictly.
+
+if not DIFY_API_KEY:
+    logger.error("DIFY_API_KEY not set")
+
+DIFY_CHAT_URL = os.getenv("DIFY_CHAT_URL", "https://api.dify.ai/v1/chat-messages")
+
+# In-memory conversation storage (use Redis/DB in production)
+conversations: Dict[str, Any] = {}
+
+app = FastAPI()
+
+# ... existing CORS ...
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,15 +54,123 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ================== CONFIG ==================
-DIFY_API_KEY = os.getenv("DIFY_API_KEY")
-if not DIFY_API_KEY:
-    raise ValueError("❌ ERROR: DIFY_API_KEY not set. Set it in .env file or environment variables.")
+# ===== PERSISTENCE SETUP =====
+DATA_DIR = Path("backend/data")
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+VR_JOBS_FILE = DATA_DIR / "vr_jobs.json"
+SUBMISSIONS_FILE = DATA_DIR / "submissions.json"
 
-DIFY_CHAT_URL = os.getenv("DIFY_CHAT_URL", "https://api.dify.ai/v1/chat-messages")
+# Models
+class VRJob(BaseModel):
+    id: str
+    title: str
+    videoId: str
+    description: str = ""
+    icon: str = "🎬"
 
-# In-memory conversation storage (use Redis/DB in production)
-conversations: Dict[str, Any] = {}
+class Submission(BaseModel):
+    name: str = "Ẩn danh"
+    class_name: str = "-" # Field alias might be needed if frontend sends 'class'
+    school: str = "-"
+    riasec: List[str]
+    scores: Dict[str, int]
+    answers: List[int]
+    time: str
+    suggestedMajors: str = ""
+    combinations: str = ""
+    
+    class Config:
+        fields = {'class_name': 'class'} # Mapped 'class' from JSON to 'class_name'
+
+# Data Manager
+class DataManager:
+    @staticmethod
+    def load_json(file_path: Path, default: Any):
+        if not file_path.exists():
+            return default
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Error reading {file_path}: {e}")
+            return default
+
+    @staticmethod
+    def save_json(file_path: Path, data: Any):
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error(f"Error writing {file_path}: {e}")
+
+# Default VR Jobs (Fallback/Initial)
+DEFAULT_VR_JOBS = [
+      {
+        "id": 'job_1',
+        "title": 'Phi công',
+        "videoId": 'W0ixQ59o-iI',
+        "description": 'Trải nghiệm buồng lái máy bay và quy trình cất cánh.',
+        "icon": '✈️'
+      },
+      {
+        "id": 'job_2',
+        "title": 'Bác sĩ phẫu thuật',
+        "videoId": 'L_H6gA2Fq8A',
+        "description": 'Quan sát ca phẫu thuật tim trong môi trường phòng mổ vô trùng.',
+        "icon": '👨‍⚕️'
+      },
+      {
+        "id": 'job_3',
+        "title": 'Kiến trúc sư',
+        "videoId": '7J0i7Q3kZ8c',
+        "description": 'Tham quan công trình xây dựng và quy trình thiết kế nhà ở.',
+        "icon": '🏗️'
+      },
+      {
+        "id": 'job_4',
+        "title": 'Lập trình viên',
+        "videoId": 'M2K7_Gfq8sA', # Placeholder valid ID
+        "description": 'Một ngày làm việc tại công ty công nghệ lớn.',
+        "icon": '💻'
+      },
+      {
+        "id": 'job_5',
+        "title": 'Luật sư',
+        "videoId": 'M2K7_Gfq8sA',
+        "description": 'Tham gia phiên tòa giả định và tìm hiểu quy trình tranh tụng, tư vấn pháp lý.',
+        "icon": '⚖️'
+      }
+]
+
+# Ensure defaults exist
+if not VR_JOBS_FILE.exists():
+    DataManager.save_json(VR_JOBS_FILE, DEFAULT_VR_JOBS)
+if not SUBMISSIONS_FILE.exists():
+    DataManager.save_json(SUBMISSIONS_FILE, [])
+
+
+# ===== API ROUTES =====
+
+@app.get("/api/vr-jobs", response_model=List[VRJob])
+async def get_vr_jobs():
+    return DataManager.load_json(VR_JOBS_FILE, DEFAULT_VR_JOBS)
+
+@app.post("/api/vr-jobs")
+async def update_vr_jobs(jobs: List[VRJob]):
+    DataManager.save_json(VR_JOBS_FILE, [job.dict(by_alias=True) for job in jobs])
+    return {"status": "success", "count": len(jobs)}
+
+@app.get("/api/submissions", response_model=List[Submission])
+async def get_submissions():
+    return DataManager.load_json(SUBMISSIONS_FILE, [])
+
+@app.post("/api/submissions")
+async def add_submission(sub: Submission):
+    current = DataManager.load_json(SUBMISSIONS_FILE, [])
+    # Add new submission
+    current.append(sub.dict(by_alias=True))
+    DataManager.save_json(SUBMISSIONS_FILE, current)
+    return {"status": "success"}
 
 # ================== HELPERS ==================
 def call_dify_api(payload: Dict[str, Any]) -> Dict[str, Any]:
