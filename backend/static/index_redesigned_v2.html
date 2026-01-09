@@ -1190,29 +1190,7 @@
       return { scores, top3, answered: 50, raw_answers: answers };
     }
 
-    // ===== SUBMIT TEST =====
-    $('testForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const result = calculateRIASEC();
-      if (!result) return;
 
-      const record = {
-        name: $('name').value || 'Ẩn danh',
-        class: $('class').value || '-',
-        school: $('school').value || '-',
-        riasec: result.top3,
-        scores: result.scores,
-        answers: result.raw_answers,
-        time: new Date().toISOString()
-      };
-
-      const db = readDB();
-      db.push(record);
-      writeDB(db);
-      writeCurrent(record);
-
-      goPage('results');
-    });
 
     // ===== SHOW RESULTS =====
     function showResults() {
@@ -1334,21 +1312,15 @@
       const html = `
         <div style="overflow-x: auto; background: rgba(15, 31, 58, 0.8); border: 1px solid rgba(30, 42, 68, 0.5); border-radius: 12px; padding: 1rem;">
           <h3 style="margin-bottom: 1rem; color: #4d7cff;">📋 Danh sách kết quả chi tiết</h3>
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 800px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 1000px;">
             <thead style="background: rgba(26, 60, 255, 0.2); color: #fff;">
               <tr>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">STT</th>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Ngày</th>
                 <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Họ tên</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Lớp</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Trường</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #ff4d4f;">R</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #ffa940;">I</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #ffec3d;">A</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #73d13d;">S</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #4096ff;">E</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5); color: #9254de;">C</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Top 3 RIASEC</th>
+                <th style="padding: 0.75rem; text-align: center; border: 1px solid rgba(30, 42, 68, 0.5);">RIASEC</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5); width: 25%;">Các ngành gợi ý</th>
+                <th style="padding: 0.75rem; text-align: left; border: 1px solid rgba(30, 42, 68, 0.5);">Tổ hợp xét tuyển</th>
               </tr>
             </thead>
             <tbody>
@@ -1358,21 +1330,23 @@
                 <tr style="border-bottom: 1px solid rgba(30, 42, 68, 0.3);">
                   <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${index + 1}</td>
                   <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">${new Date(row.time).toLocaleDateString('vi-VN')}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-weight: 500;">${row.name || 'Ẩn danh'}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">${row.class || '-'}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">${row.school || '-'}</td>
+                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-weight: 500;">
+                    ${row.name || 'Ẩn danh'}<br>
+                    <span style="font-size: 0.8rem; color: #9fb7ff;">${row.class || '-'}</span>
+                  </td>
                   
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.R || 0}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.I || 0}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.A || 0}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.S || 0}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.E || 0}</td>
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">${s.C || 0}</td>
-                  
-                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5);">
+                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); text-align: center;">
                     <span class="badge" style="background: rgba(26, 60, 255, 0.1); border-color: rgba(77, 124, 255, 0.5);">
                       ${(row.riasec || []).join('-')}
                     </span>
+                  </td>
+                  
+                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
+                    ${row.suggestedMajors || '<i style="color: #666">Chưa có dữ liệu</i>'}
+                  </td>
+                  
+                  <td style="padding: 0.75rem; border: 1px solid rgba(30, 42, 68, 0.5); font-size: 0.85rem;">
+                    ${row.combinations || '<i style="color: #666">-</i>'}
                   </td>
                 </tr>
                 `;
@@ -1411,6 +1385,83 @@
       showDashboard();
       alert('Đã xoá tất cả dữ liệu');
     }
+
+    // ===== RECOMMENDATION LOGIC HELPER =====
+    const GROUP_COMBINATIONS = {
+      "CNTT": "A00, A01, D01",
+      "Y Sinh": "B00, A00, D07",
+      "Giáo dục": "C00, D01, A00",
+      "Xã hội": "C00, D01, D14",
+      "Nghệ thuật": "H00, V00, H01",
+      "Truyền thông": "C00, D01, A01",
+      "Kinh tế": "A00, A01, D01",
+      "Quản lý": "A00, A01, D01",
+      "Dịch vụ": "C00, D01, A00",
+      "Pháp luật": "A00, A01, C00",
+      "Hành chính": "C00, D01, A01",
+      "An ninh": "A00, C03, D01",
+      "Nông nghiệp": "B00, A00, D01",
+      "Công nghệ": "A00, A01, B00",
+      "Kỹ thuật": "A00, A01, D01"
+    };
+
+    function getRecommendations(userCodes) {
+      // Logic copied and adapted from showResults
+      let recommendations = MAJORS_DB.map(job => {
+        const jobCodes = job.code.split('-');
+        const intersection = jobCodes.filter(c => userCodes.includes(c));
+        const matchCount = intersection.length;
+
+        let score = matchCount * 10;
+        if (matchCount === 3) score += 20;
+        if (jobCodes[0] === userCodes[0]) score += 5;
+
+        return { ...job, matchCount, score };
+      });
+
+      // Filter and Sort
+      recommendations = recommendations.filter(r => r.matchCount >= 2);
+      recommendations.sort((a, b) => b.score - a.score);
+
+      const top4 = recommendations.slice(0, 4);
+
+      return top4.map(major => ({
+        name: major.name,
+        combinations: GROUP_COMBINATIONS[major.group] || "A00, A01"
+      }));
+    }
+
+    // ===== SUBMIT TEST =====
+    $('testForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const result = calculateRIASEC();
+      if (!result) return;
+
+      // Get recommendations to save
+      const recs = getRecommendations(result.top3);
+      const majorNames = recs.map(r => r.name).join(', ');
+      // Get unique combinations from the top recs
+      const uniqueCombs = [...new Set(recs.map(r => r.combinations))].join(' | ');
+
+      const record = {
+        name: $('name').value || 'Ẩn danh',
+        class: $('class').value || '-',
+        school: $('school').value || '-',
+        riasec: result.top3,
+        scores: result.scores,
+        answers: result.raw_answers,
+        time: new Date().toISOString(),
+        suggestedMajors: majorNames,
+        combinations: uniqueCombs
+      };
+
+      const db = readDB();
+      db.push(record);
+      writeDB(db);
+      writeCurrent(record);
+
+      goPage('results');
+    });
 
     // ===== CHATBOT =====
     // Use relative URL - works on localhost and production
@@ -1529,12 +1580,25 @@
           }
         }
 
+        // Calculate Top 3 for Prompt
+        let scoreString = "";
+        if (current.scores) {
+          const sortedItems = Object.entries(current.scores)
+            .sort((a, b) => b[1] - a[1]) // Sort desc
+            .slice(0, 3); // Get top 3
+
+          // Format: [S: 25, A: 20, C: 15]
+          scoreString = sortedItems.map(item => `${item[0]}: ${item[1]}`).join(", ");
+        }
+
         console.log('📤 Sending to API:', {
           name: current.name,
           class: current.class,
           school: current.school,
           answer: answerArray
         });
+
+        const initialPrompt = `Hãy giới thiệu về các hướng nghiệp phù hợp cho tôi dựa trên kết quả RIASEC của tôi. Hãy theo kết quả này: [${scoreString}]. Hãy trả lời súc tích, ngắn gọn, đảm bảo không bị cắt ngang giữa chừng.`;
 
         const response = await fetch(`${API_BASE}/start-conversation`, {
           method: 'POST',
@@ -1544,8 +1608,7 @@
             class: current.class || '-',
             school: current.school || '-',
             answer: answerArray,
-            answer: answerArray,
-            initial_question: "Hãy giới thiệu về các hướng nghiệp phù hợp cho tôi dựa trên kết quả RIASEC của tôi. Hãy trả lời súc tích, ngắn gọn, đảm bảo không bị cắt ngang giữa chừng."
+            initial_question: initialPrompt
           })
         });
 
